@@ -1,5 +1,6 @@
 package com.jdbc;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,7 +46,8 @@ public class LoginForm extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
       String email = emailField.getText();
-      char[] password = passwordField.getPassword();
+      char[] passwordChars = passwordField.getPassword();
+      String password = new String(passwordChars);
 
       // Insert user record into the database
       try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
@@ -57,6 +59,7 @@ public class LoginForm extends JFrame implements ActionListener {
               try(ResultSet resultSet = statement.executeQuery()){
             	  if(resultSet.next()) {
             		  JOptionPane.showMessageDialog(this, "Login Successful");
+            		  openDashboard();
             	  }else {
             		  JOptionPane.showMessageDialog(this, "Invalid email or password. Please try again");
             	  }
@@ -66,6 +69,101 @@ public class LoginForm extends JFrame implements ActionListener {
           JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
       }
   }
+    
+   private void openDashboard() {
+	   JFrame dashboard = new JFrame("Dashboard");
+	   dashboard.setSize(900,900);
+	   dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	   dashboard.setLayout(new GridLayout(3,1,10,5));
+	   
+	   JButton booksButton = new JButton("Book List");
+	   JButton studentButton = new JButton("Student List"); 
+	   JButton logoutButton = new JButton("Logout");
+	   
+       booksButton.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+              dashboard.dispose();
+              openBooksWindow();
+           }
+       });
+       
+       studentButton.addActionListener(new ActionListener() {
+    	   @Override
+    	   public void actionPerformed(ActionEvent e) {
+    		   JOptionPane.showMessageDialog(dashboard,"Users Button Clicked");
+    	   }
+       });
+       
+       logoutButton.addActionListener(new ActionListener() {
+    	   @Override
+    	   public void actionPerformed(ActionEvent e)
+    	   {
+    		   dashboard.dispose();
+    		   LoginForm.this.setVisible(true);
+    	   }
+       });
+       
+
+       dashboard.add(booksButton);
+       dashboard.add(studentButton);
+       dashboard.add(logoutButton);
+       
+       dashboard.setVisible(true);
+       this.setVisible(false);
+       
+       
+   }	
+   
+   private void openBooksWindow()
+   {
+	   JFrame booksWindow = new JFrame("Books");
+	   booksWindow.setSize(1200,1200);
+	   booksWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	   booksWindow.setLayout(new GridLayout(3,1,10,5));
+	   
+	   JTextField searchField = new JTextField();
+	   JButton searchButton = new JButton("Search");
+	   
+	   JPanel topPanel = new JPanel();
+	   topPanel.add(new JLabel("Search: "));
+	   topPanel.add(searchField);
+	   topPanel.add(searchButton);
+	   
+	   JTable booksTable = new JTable();
+	   JScrollPane tableScrollPane = new JScrollPane(booksTable);
+
+	   
+	    JTextField titleField = new JTextField(20);
+	    JTextField authorField = new JTextField(20);
+	    JTextField genreField = new JTextField(20);
+	    JTextField publishedDateField = new JTextField(20);
+	    JButton addButton = new JButton("Add Book");
+	   
+	   JPanel formPanel = new JPanel(new GridLayout(3,2,10,5));
+	   formPanel.add(new JLabel("Title:"));
+	   formPanel.add(titleField);
+	   formPanel.add(new JLabel("Author:"));
+	   formPanel.add(authorField);
+	   formPanel.add(new JLabel("Genre:"));
+	   formPanel.add(genreField);
+	   formPanel.add(new JLabel("Published Date"));
+	   formPanel.add(publishedDateField);	   
+	   	   
+	   booksWindow.add(topPanel,BorderLayout.NORTH);
+	   booksWindow.add(tableScrollPane,BorderLayout.NORTH);
+	   booksWindow.add(addButton,BorderLayout.NORTH);
+	   
+	   addButton.addActionListener(new ActionListener(){
+	   		@Override
+	   		public void actionPerformed(ActionEvent e)
+	   		{
+	   			JOptionPane.showMessageDialog(booksWindow,"Added Books");
+	   		}
+	   });
+	   
+	   booksWindow.setVisible(true);
+   }
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
