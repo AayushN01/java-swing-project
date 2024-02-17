@@ -138,6 +138,7 @@ public class LoginForm extends JFrame implements ActionListener {
 	    JTextField authorField = new JTextField(20);
 	    JTextField genreField = new JTextField(20);
 	    JTextField publishedDateField = new JTextField(20);
+	    JTextField quantityField = new JTextField(20);
 	    JButton addButton = new JButton("Add Book");
 	   
 	   JPanel formPanel = new JPanel(new GridLayout(3,2,10,5));
@@ -148,17 +149,40 @@ public class LoginForm extends JFrame implements ActionListener {
 	   formPanel.add(new JLabel("Genre:"));
 	   formPanel.add(genreField);
 	   formPanel.add(new JLabel("Published Date"));
-	   formPanel.add(publishedDateField);	   
+	   formPanel.add(publishedDateField);	
+	   formPanel.add(new JLabel("Quantity"));
+	   formPanel.add(quantityField);
 	   	   
 	   booksWindow.add(topPanel,BorderLayout.NORTH);
-	   booksWindow.add(tableScrollPane,BorderLayout.NORTH);
-	   booksWindow.add(addButton,BorderLayout.NORTH);
+	   booksWindow.add(tableScrollPane,BorderLayout.CENTER);
+	   booksWindow.add(addButton,BorderLayout.SOUTH);
 	   
 	   addButton.addActionListener(new ActionListener(){
 	   		@Override
 	   		public void actionPerformed(ActionEvent e)
 	   		{
-	   			JOptionPane.showMessageDialog(booksWindow,"Added Books");
+	   			String title = titleField.getText();
+	   			String author = titleField.getText();
+	   			String genre = titleField.getText();
+	   			String publishedDte = titleField.getText();
+	   			String quantity = titleField.getText();
+	   			
+	   	        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+	   	            String sql = "INSERT INTO books (title,author,genre,publishedDate,quantity) VALUES (?, ?,?,?,?)";
+	   	            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+//	   	                statement.setString(1, id);
+	   	                statement.setString(1, title);
+	   	                statement.setString(2, author);
+	   	                statement.setString(3, genre);
+	   	                statement.setString(4, publishedDte);
+	   	                statement.setString(5, quantity); 
+	   	                statement.executeUpdate();
+	   	                
+	   	                JOptionPane.showMessageDialog(booksWindow,"Users Button Clicked");
+	   	            }
+	   	        } catch (SQLException ex) {
+	   	            JOptionPane.showMessageDialog(booksWindow, "Error: " + ex.getMessage());
+	   	        }
 	   		}
 	   });
 	   
