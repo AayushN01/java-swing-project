@@ -91,7 +91,8 @@ public class LoginForm extends JFrame implements ActionListener {
        studentButton.addActionListener(new ActionListener() {
     	   @Override
     	   public void actionPerformed(ActionEvent e) {
-    		   JOptionPane.showMessageDialog(dashboard,"Users Button Clicked");
+    		   dashboard.dispose();
+    		   openStudentsWindow();
     	   }
        });
        
@@ -117,76 +118,16 @@ public class LoginForm extends JFrame implements ActionListener {
    
    private void openBooksWindow()
    {
-	   JFrame booksWindow = new JFrame("Books");
-	   booksWindow.setSize(1200,1200);
-	   booksWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	   booksWindow.setLayout(new GridLayout(3,1,10,5));
-	   
-	   JTextField searchField = new JTextField();
-	   JButton searchButton = new JButton("Search");
-	   
-	   JPanel topPanel = new JPanel();
-	   topPanel.add(new JLabel("Search: "));
-	   topPanel.add(searchField);
-	   topPanel.add(searchButton);
-	   
-	   JTable booksTable = new JTable();
-	   JScrollPane tableScrollPane = new JScrollPane(booksTable);
-
-	   
-	    JTextField titleField = new JTextField(20);
-	    JTextField authorField = new JTextField(20);
-	    JTextField genreField = new JTextField(20);
-	    JTextField publishedDateField = new JTextField(20);
-	    JTextField quantityField = new JTextField(20);
-	    JButton addButton = new JButton("Add Book");
-	   
-	   JPanel formPanel = new JPanel(new GridLayout(3,2,10,5));
-	   formPanel.add(new JLabel("Title:"));
-	   formPanel.add(titleField);
-	   formPanel.add(new JLabel("Author:"));
-	   formPanel.add(authorField);
-	   formPanel.add(new JLabel("Genre:"));
-	   formPanel.add(genreField);
-	   formPanel.add(new JLabel("Published Date"));
-	   formPanel.add(publishedDateField);	
-	   formPanel.add(new JLabel("Quantity"));
-	   formPanel.add(quantityField);
-	   	   
-	   booksWindow.add(topPanel,BorderLayout.NORTH);
-	   booksWindow.add(tableScrollPane,BorderLayout.CENTER);
-	   booksWindow.add(addButton,BorderLayout.SOUTH);
-	   
-	   addButton.addActionListener(new ActionListener(){
-	   		@Override
-	   		public void actionPerformed(ActionEvent e)
-	   		{
-	   			String title = titleField.getText();
-	   			String author = titleField.getText();
-	   			String genre = titleField.getText();
-	   			String publishedDte = titleField.getText();
-	   			String quantity = titleField.getText();
-	   			
-	   	        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
-	   	            String sql = "INSERT INTO books (title,author,genre,publishedDate,quantity) VALUES (?, ?,?,?,?)";
-	   	            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-//	   	                statement.setString(1, id);
-	   	                statement.setString(1, title);
-	   	                statement.setString(2, author);
-	   	                statement.setString(3, genre);
-	   	                statement.setString(4, publishedDte);
-	   	                statement.setString(5, quantity); 
-	   	                statement.executeUpdate();
-	   	                
-	   	                JOptionPane.showMessageDialog(booksWindow,"Users Button Clicked");
-	   	            }
-	   	        } catch (SQLException ex) {
-	   	            JOptionPane.showMessageDialog(booksWindow, "Error: " + ex.getMessage());
-	   	        }
-	   		}
-	   });
-	   
-	   booksWindow.setVisible(true);
+ 	   BookWindow bookWindow = new BookWindow();
+ 	   bookWindow.setVisible(true);
+ 	   this.setVisible(false);
+   }
+   
+   private void openStudentsWindow()
+   {
+	   StudentWindow studentWindow = new StudentWindow();
+	   studentWindow.setVisible(true);
+	   this.setVisible(false);
    }
 
 	public static void main(String[] args) {
