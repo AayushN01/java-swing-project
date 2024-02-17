@@ -105,8 +105,29 @@ public class StudentWindow extends JFrame implements ActionListener{
             }
         });
         
+        JButton logsButton = new JButton("View Logs");
+        logsButton.addActionListener(this);
+        facultyPanel.add(logsButton);
+        logsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               openBookLogsWindow();
+            }
+        });
         
-        	
+        
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(this);
+        facultyPanel.add(logoutButton);
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StudentWindow.this.setVisible(false);
+           	   LoginForm adminLoginForm = new LoginForm();
+          	   adminLoginForm.setVisible(true);
+            }
+        });
+
         add(facultyPanel, BorderLayout.NORTH);
 
 		
@@ -234,6 +255,13 @@ public class StudentWindow extends JFrame implements ActionListener{
   	   BookWindow bookWindow = new BookWindow();
   	   bookWindow.setVisible(true);
   	   this.setVisible(false);
+    }
+    
+    private void openBookLogsWindow()
+    {
+    	BookLog bookLog = new BookLog();
+    	bookLog.setVisible(true);
+    	this.setVisible(false);
     }
 
 	public static void main(String[] args) {

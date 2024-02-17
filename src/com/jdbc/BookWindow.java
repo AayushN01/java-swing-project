@@ -94,6 +94,26 @@ public class BookWindow extends JFrame implements ActionListener{
             }
         });
         
+        JButton logsButton = new JButton("View Logs");
+        logsButton.addActionListener(this);
+        genrePanel.add(logsButton);
+        logsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               openBookLogsWindow();
+            }
+        });
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(this);
+        genrePanel.add(logoutButton);
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               BookWindow.this.setVisible(false);
+          	   LoginForm adminLoginForm = new LoginForm();
+         	   adminLoginForm.setVisible(true);
+            }
+        });
       
         add(genrePanel, BorderLayout.NORTH);
 
@@ -236,6 +256,12 @@ public class BookWindow extends JFrame implements ActionListener{
   	   this.setVisible(false);
     }
 	
+    private void openBookLogsWindow()
+    {
+    	BookLog bookLog = new BookLog();
+    	bookLog.setVisible(true);
+    	this.setVisible(false);
+    }
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

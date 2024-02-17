@@ -17,6 +17,7 @@ public class LoginForm extends JFrame implements ActionListener {
 	private JTextField emailField;
 	private JPasswordField passwordField;
 	private JButton loginButton;
+	private JButton bookLogButton;
 	
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/mscitm";
     private static final String USERNAME = "root";
@@ -74,10 +75,11 @@ public class LoginForm extends JFrame implements ActionListener {
 	   JFrame dashboard = new JFrame("Dashboard");
 	   dashboard.setSize(900,900);
 	   dashboard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	   dashboard.setLayout(new GridLayout(3,1,10,5));
+	   dashboard.setLayout(new GridLayout(4,1,10,5));
 	   
 	   JButton booksButton = new JButton("Book List");
 	   JButton studentButton = new JButton("Student List"); 
+	   JButton bookLogButton = new JButton("Book Log");
 	   JButton logoutButton = new JButton("Logout");
 	   
        booksButton.addActionListener(new ActionListener() {
@@ -96,6 +98,14 @@ public class LoginForm extends JFrame implements ActionListener {
     	   }
        });
        
+       bookLogButton.addActionListener(new ActionListener() {
+    	   @Override
+    	   public void actionPerformed(ActionEvent e) {
+    		   dashboard.dispose();
+    		   openBookLogWindow();
+    	   }
+       });
+       
        logoutButton.addActionListener(new ActionListener() {
     	   @Override
     	   public void actionPerformed(ActionEvent e)
@@ -108,6 +118,7 @@ public class LoginForm extends JFrame implements ActionListener {
 
        dashboard.add(booksButton);
        dashboard.add(studentButton);
+       dashboard.add(bookLogButton);
        dashboard.add(logoutButton);
        
        dashboard.setVisible(true);
@@ -129,6 +140,15 @@ public class LoginForm extends JFrame implements ActionListener {
 	   studentWindow.setVisible(true);
 	   this.setVisible(false);
    }
+   
+   private void openBookLogWindow()
+   {
+	  BookLog bookLog = new BookLog();
+	  bookLog.setVisible(true);
+	  this.setVisible(false);
+   }
+   
+   
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
