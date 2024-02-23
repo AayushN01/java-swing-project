@@ -1,4 +1,4 @@
-package com.jdbc;
+package com.designPattern;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,13 +21,15 @@ public class StudentBookWindow extends JFrame implements ActionListener{
 	
     private JComboBox<String> bookDropdown, genreDropdown;
     private JTextField borrowedDateField, returnedDateField;
-    private DefaultTableModel allBooksTableModel, borrowedBooksTableModel;
-    
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/mscitm";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
-    
-    public StudentBookWindow() {
+    private DefaultTableModel allBooksTableModel, borrowedBooksTableModel, tableModel;
+    private JTable allBooksTable, borrowedBooksTable;
+	
+    private DatabaseConnection database;
+	private BookGenre bookGenre;
+	
+    public StudentBookWindow(DatabaseConnection database) {
+    	this.database = database;
+		this.bookGenre = BookGenre.getInstance();
         setTitle("Student Book Borrowing");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1500, 1500);
@@ -41,13 +42,14 @@ public class StudentBookWindow extends JFrame implements ActionListener{
         allBooksScrollPane.setPreferredSize(new Dimension(900, 300));
         add(allBooksScrollPane, BorderLayout.CENTER);
         
-        fetchAllBooksData();
+		tableModel = new DefaultTableModel(allBooksColumnNames,0);
+        bookGenre.fetchAllBooksData(database, allBooksTable, allBooksTableModel);
 
         
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
  
         genreDropdown = new JComboBox<>();
-        populateGenreDropdown();
+        bookGenre.populateGenreDropdown(database, genreDropdown);
         searchPanel.add(new JLabel("Select Genre:"));
         searchPanel.add(genreDropdown);
         
@@ -62,8 +64,8 @@ public class StudentBookWindow extends JFrame implements ActionListener{
     	   @Override
     	   public void actionPerformed(ActionEvent e)
     	   {	
-    	 	   StudentLoginForm studentLoginForm = new StudentLoginForm();
-    	 	   studentLoginForm.setVisible(true);
+    	 	   HomeWindow home = new HomeWindow();
+    	 	   home.setVisible(true);
     		   StudentBookWindow.this.setVisible(false);
     		   
     	   }
@@ -110,24 +112,10 @@ public class StudentBookWindow extends JFrame implements ActionListener{
         setVisible(true);
     }
     
-    private void populateGenreDropdown() {
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
-            String sql = "SELECT DISTINCT genre FROM books";
-            try (PreparedStatement statement = connection.prepareStatement(sql);
-                 ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    String genre = resultSet.getString("genre");
-                    genreDropdown.addItem(genre);
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error fetching genres from the database: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+
     
     private void populateBookDropdown() {
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+        try (Connection connection = database.getConnection()) {
             String sql = "SELECT title FROM books";
             try (PreparedStatement statement = connection.prepareStatement(sql);
                  ResultSet resultSet = statement.executeQuery()) {
@@ -143,7 +131,7 @@ public class StudentBookWindow extends JFrame implements ActionListener{
     }
     
 	private void fetchAllBooksData() {
-		try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+		try (Connection connection = database.getConnection()) {
             String sql = "SELECT * FROM books";
             try (PreparedStatement statement = connection.prepareStatement(sql);
                  ResultSet resultSet = statement.executeQuery()) {
@@ -175,7 +163,7 @@ public class StudentBookWindow extends JFrame implements ActionListener{
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDate borrowedDate = LocalDate.parse(borrowedDateString, formatter);
-            try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            try (Connection connection = database.getConnection()) {
                 String insertSql = "INSERT INTO borrowed_books (student_id, book_title, borrowed_date) VALUES (?, ?, ?)";
                 try (PreparedStatement insertStatement = connection.prepareStatement(insertSql)) {
 
@@ -214,7 +202,7 @@ public class StudentBookWindow extends JFrame implements ActionListener{
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDate returnedDate = LocalDate.parse(returnedDateString, formatter);
             
-            try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            try (Connection connection = database.getConnection()) {
                 
                 String updateReturnedDateSql = "UPDATE borrowed_books SET returned_date = ? WHERE student_id = ? AND book_title = ? AND returned_date IS NULL";
                 try (PreparedStatement updateReturnedDateStatement = connection.prepareStatement(updateReturnedDateSql)) {
@@ -268,7 +256,7 @@ public class StudentBookWindow extends JFrame implements ActionListener{
         // Clear existing data in the table
         allBooksTableModel.setRowCount(0);
 
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+        try (Connection connection = database.getConnection()) {
             String sql = "SELECT * FROM books WHERE genre = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, selectedGenre);
@@ -293,11 +281,14 @@ public class StudentBookWindow extends JFrame implements ActionListener{
 
 
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
         SwingUtilities.invokeLater(() -> {
-            StudentBookWindow studentBookWindow = new StudentBookWindow();
-            studentBookWindow.setVisible(true);
+            DatabaseConnection database = DatabaseConnection.getInstance();
+            StudentBookWindow sBookWindow = new StudentBookWindow(database);
+            sBookWindow.setVisible(true);
+            sBookWindow.setLayout(null);
         });
-    }
+	}
 
 }

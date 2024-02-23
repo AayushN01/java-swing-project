@@ -1,4 +1,4 @@
-package com.jdbc;
+package com.designPattern;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,11 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 public class HomeWindow extends JFrame implements ActionListener{
-	
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/mscitm";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
-       
+	    
 	
     public HomeWindow() {
         setTitle("Library Management System");
@@ -50,13 +46,13 @@ public class HomeWindow extends JFrame implements ActionListener{
  }
     
     private void showAdminLogin() {
- 	   LoginForm adminLoginForm = new LoginForm();
- 	   adminLoginForm.setVisible(true);
- 	   this.setVisible(false);
+        LoginForm adminLoginForm = new LoginForm(DatabaseConnection.getInstance());
+        adminLoginForm.setVisible(true);
+        this.setVisible(false);
     }
     
     private void showStudentLogin() {
- 	   StudentLoginForm studentLoginForm = new StudentLoginForm();
+ 	   StudentLoginForm studentLoginForm = new StudentLoginForm(DatabaseConnection.getInstance());
  	  studentLoginForm.setVisible(true);
  	   this.setVisible(false);
     }
